@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 
 import { isCpfCnpjValid } from "../utils/cpfCnpj";
-import { processFile } from "../utils/csv";
+import { csvFilePath, processFile } from "../utils/csv";
 import { formatCurrency, isToFormatCurrency } from "../utils/currency";
 import { formatDate, isToFormatDate } from "../utils/date";
 
 export const getData = async (req: Request, res: Response) => {
-  const csvFilePath = "../data.csv";
   let data: Array<Object> = [];
 
   try {

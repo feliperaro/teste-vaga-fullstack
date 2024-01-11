@@ -1,6 +1,8 @@
 import fs from "fs";
 import { parse } from "csv-parse";
 
+export const csvFilePath = "../data.csv";
+
 export const processFile = async (filePath: string, toLine: number = 10) => {
   const records = [];
   const parser = fs.createReadStream(filePath).pipe(
