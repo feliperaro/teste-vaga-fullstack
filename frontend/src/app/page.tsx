@@ -1,6 +1,6 @@
 "use server";
 
-import Image from "next/image";
+import Logo from "./components/logo";
 import styles from "./page.module.css";
 
 async function getData() {
@@ -18,16 +18,7 @@ export default async function Home() {
 
   return (
     <main className={styles.main}>
-      <div>
-        <Image
-          className={styles.logo}
-          src="/logo-kronoos.png"
-          alt="Kronoos Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      <Logo />
       <div className={styles.center}>
         <ul style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {data.map((e: any) => {
