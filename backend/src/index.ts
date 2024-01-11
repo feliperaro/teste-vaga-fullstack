@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express, { Express, Request, Response } from "express";
 import { processFile } from "./utils/csv";
 import { formatDate, isToFormatDate } from "./utils/date";
 import { formatCurrency, isToFormatCurrency } from "./utils/currency";
@@ -6,31 +6,35 @@ import { isCpfCnpjValid } from "./utils/cpfCnpj";
 
 const app: Express = express();
 
-app.get("/api/data", (_, res) => {
-  const csvFilePath = "../data.csv";
+app.use(express.json());
 
+app.get("/api/data", (req: Request, res: Response) => {
   (async () => {
-    const rows: Array<string[]> = await processFile(csvFilePath);
-    const headers: Array<string> = rows[0];
-
     let data: Array<Object> = [];
-    rows.forEach((rowValue: string[], index: number) => {
-      if (index === 0 || index > 10) return;
+    const csvFilePath = "../data.csv";
 
+    const pageSize: number = Number(req.query.pageSize) || 10;
+    const toLine: number = pageSize + 1;
+
+    const rows: Array<Object> = await processFile(csvFilePath, toLine);
+    rows.forEach((rowValue, index: number) => {
       const row: string = String(index + 1);
       let rowData: Object = { row };
-      rowValue.forEach((value: string, i: number) => {
-        const column = headers[i];
-        if (isToFormatCurrency(column)) value = formatCurrency(value);
-        else if (isToFormatDate(column)) value = formatDate(value);
-        else if (column === "nrCpfCnpj") isCpfCnpjValid(value); 
 
-        rowData = { ...rowData, [column]: value };
+      Object.entries(rowValue).forEach(([key, value]) => {
+        if (isToFormatCurrency(key)) value = formatCurrency(value);
+        else if (isToFormatDate(key)) value = formatDate(value);
+        else if (key === "nrCpfCnpj") isCpfCnpjValid(value);
+        rowData = { ...rowData, [key]: value };
       });
 
       data.push(rowData);
     });
-    res.send(data);
+
+    res.json({
+      pageSize,
+      data,
+    });
   })();
 });
 
